@@ -1,0 +1,10 @@
+<main role="main" class="inline-block align-middle p-5">
+	<h1><%- statusCode %></h1>
+	<div class="inline-block align-middle">
+		<h3><%- message %></h3>
+		<% try { %>
+			<p><%- stack %></p>
+		<% } catch { } %>
+	</div>
+	</div>
+</main>

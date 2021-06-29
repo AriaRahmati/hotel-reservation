@@ -1,0 +1,88 @@
+<% const {search, type, old} = req.query; %>
+
+<main role="main">
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">رزرواسیون هتل بی‌نام</h1>
+            <p class="lead text-muted">در این صفحه تمامی اتاق‌های سایت را مشاهده می‌کنید</p>
+            <form action="/room" method="GET">
+                <div class="input-group md-form form-sm form-2 pl-0">
+                    <input class="form-control my-0 py-1 red-border" type="text"
+                        placeholder="اتاق مورد نظر خود را جستجو کنید" aria-label="Search" name="search">
+                    <div class="input-group-append">
+                        <button type="submit" class="input-group-text red lighten-3" id="basic-text1">جستجو</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <% if (!rooms.docs.length) { %>
+            <div class="alert alert-danger">متاسفانه اتاقی با این فیلتر‌ها پیدا نشد</div>    
+        <% } %>
+        <section>
+            <h1 class="mb-3"></h1>
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="album">
+                        <div class="container">
+                            <% if(rooms.docs.length) { %>
+                            <div class="row">
+                                <% rooms.docs.forEach(room => { %>
+                                <div class="col-md-4">
+                                    <div class="card mb-4">
+                                        <a href="<%- room.path() %>"><img src="<%- room.images['480'] %>" alt="<% room.title %>" class="card-img-top"></a>
+                                        <div class="card-body">
+                                            <h5 class="card-text mb-4"><%- room.title %></h5>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="btn-group">
+                                                    <a href="<%= room.path() %>"
+                                                        class="btn btn-sm btn-outline-secondary">رزرو اتاق</a>
+                                                </div>
+                                                <small class="text-muted"><%- room.price.toLocaleString('fa-IR') %> تومان</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card mb-4 wow fadeIn">
+                        <h5 class="card-header">فیلتر کردن اطلاعات</h5>
+                        <div class="card-body">
+                            <form class="form-horizontal" method="GET" action="/room">
+                                <label>جستجو : <%= search %></label>
+                                <div class="form-group">
+                                    <label for="type" class="control-label font-weight-bold font-weight-bold">نوع
+                                        اتاق</label>
+                                    <select name="type" id="type" class="form-control">
+                                        <option value="all" <%= type === 'all' ? 'selected' : '' %>>همه اتاق‌ها</option>
+                                        <option value="vip" <%= type === 'vip' ? 'selected' : '' %>>ویژه</option>
+                                        <option value="normal" <%= type === 'normal' ? 'selected' : '' %>>عادی</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <input id="remember" type="checkbox" class="checkbox" name="old" value="1" <%= old === '1' ? 'checked' : '' %>>
+                                    قدیمی‌ترین اتاق
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-sm btn-primary">فیلتر</button>
+                                    <a href="/room" class="btn btn-sm btn-danger">حذف</a>
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <% const { docs, ...rest } = rooms; %>
+        <%- include(viewPath('layouts/pagination'), { pagination: rest, pageUrl: '/room' }); %>
+    </div>
+</main>

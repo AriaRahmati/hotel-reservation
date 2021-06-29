@@ -1,0 +1,53 @@
+<style>
+</style>
+
+<!-- <div class="bg-light p-5 rounded">
+  <h1>Navbar example</h1>
+  <p class="lead">This example is a quick exercise to illustrate how the top-aligned navbar works. As you scroll,
+    this navbar remains in its original position and moves with the rest of the page.</p>
+  <a class="btn btn-lg btn-primary" href="/docs/5.0/components/navbar/" role="button">View navbar docs &raquo;</a>
+</div> -->
+
+<main role="main">
+  <section class="jumbotron text-center">
+    <div class="container">
+      <h1 class="jumbotron-heading">رزرواسیون هتل بی‌نام</h1>
+      <p class="lead text-muted">اوج احساسات</p>
+      <p class="lead text-muted">پیشنهاد منحصر به فرد</p>
+      <p>
+        <a href="#" class="btn btn-success my-2">اتاق‌ها</a>
+        <a href="#" class="btn btn-primary my-2">بلاگ‌</a>
+        <a href="#" class="btn btn-danger my-2">اخبار‌</a>
+      </p>
+    </div>
+  </section>
+
+<% if (rooms.length) { %>
+  <div class="album mt-2">
+    <div class="container">
+      <h3 class="mb-4">اتاق‌ها</h3>
+      <div class="row">
+        <% rooms.forEach(room => { %>
+        <div class="col-md-4">
+          <div class="card mb-4">
+            <a href="<%- room.path() %>"><img src="<%- room.images['480'] %>" alt="<% room.title %>" class="card-img-top"></a>
+            <div class="card-body">
+              <h5 class="card-text mb-4"><%- room.title %></h5>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a href="<%- room.path() %>" class="btn btn-sm btn-outline-secondary">رزرو اتاق</a>
+                </div>
+                <small class="text-muted"><%- room.price.toLocaleString('fa-IR') %> تومان</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+<% } %>
+</main>
+
+<script>
+</script>

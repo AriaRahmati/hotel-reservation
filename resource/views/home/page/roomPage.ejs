@@ -1,0 +1,64 @@
+<main role="main" class="pt-5">
+    <div class="container">
+        <%- include(viewPath('layouts/error-messages'), { errorMessages }); %>
+        <%- include(viewPath('layouts/success-messages'), { successMessages }); %>
+        <section class="mt-1">
+            <div id="content">
+                <h3><%- room.title %></h3>
+            </div>
+            <hr>
+            <p class="text-muted small">
+                <span> توسط <a href="#"><%- room.user.name %></a> - </span>
+                <span>ارسال شده در <%= convertTime(room.createdAt).format('jD jMMMM jYYYY') %></span>
+            </p>
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="card mb-4 wow fadeIn">
+                        <img src="https://mdbootstrap.com/img/Photos/Slides/img%20(144).jpg" class="img-fluid" alt="">
+                    </div>
+                    <div class="card mb-4 wow fadeIn" style="visibility: visible; animation-name: fadeIn;">
+                        <div class="card-body">
+                            <p><%- room.body %></p>
+                        </div>
+                    </div>
+                    <%- include(viewPath('layouts/comment'), { data: room }); %>
+                </div>
+
+
+                <div class="col-md-4 mb-4">
+                    <div class="card blue-gradient mb-4 wow fadeIn">
+                        <div class="card-body">
+                            <h4><strong>قیمت : <%- room.price.toLocaleString('fa-IR') %> تومان</strong>
+                            </h4>
+                            <% if(auth.check) { %> 
+                                <% if (room.reserved) { %>
+                                    <button type="submit" class="btn btn-lg btn-outline-danger mt-3" disabled style="width: 100%;">رزرو شده</button>
+                                <% } else { %>
+                                    <form action="/room/payment" method="POST">
+                                        <input type="hidden" name="room" value="<%- room._id %>">
+                                        <button type="submit" class="btn btn-lg btn-success mt-3" style="width: 100%;">رزرو اتاق</button>
+                                    </form>
+                                <% } %>
+                            <% } else { %>
+                                <a href="/auth/login" class="btn btn-danger btn-lg mt-3" style="width: 100%">وارد حساب کاربری خود شوید</a>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="card mb-4 wow fadeIn">
+                        <div class="card-header">ویژگی های اتاق</div>
+                        <div class="card-body">
+                            <% if(room.type === 'vip') { %> 
+                                <label for="type" class="grey-text">نوع اتاق : ویژه</label><br>
+                            <% } else if(room.type == 'normal') { %>
+                                <label for="type" class="grey-text">نوع اتاق : عادی</label><br>
+                            <% } %> 
+                            <label for="maxPeople" class="grey-text">حداکثر نفرات : <%- room.maxPeople.toLocaleString('fa-IR') %> نفر</label><br>
+                            <label for="viewCount" class="grey-text">بازدید : <%- room.viewCount.toLocaleString('fa-IR') %></label><br>
+                            <label for="commentCount" class="grey-text">دیدگاه : <%- room.commentCount.toLocaleString('fa-IR') %></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>

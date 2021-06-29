@@ -1,0 +1,31 @@
+<div class="container">
+	<div class="row pt-5 justify-content-center">
+		<div class="col-8">
+			<div class="card card-default">
+				<div class="card-header">
+					<h5>فراموشی رمز عبور</h5>
+				</div>
+				<div class="card-body">
+					<form class="form-horizontal" method="POST" action="/auth/password/email" novalidate>
+
+						<%- include(viewPath('layouts/error-messages'), { errorMessages }); %>
+						<%- include(viewPath('layouts/success-messages'), { successMessages }); %>
+
+						<div class="form-group">
+							<label for="email" class="control-label">آدرس ایمیل</label>
+							<input id="email" type="email" class="form-control" name="email" required>
+						</div>
+
+						<div class="form-group">
+                            <%- recaptcha -%>
+                        </div>
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary">ارسال لینک بازیابی</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
