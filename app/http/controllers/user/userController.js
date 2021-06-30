@@ -3,7 +3,7 @@ const Controller = require('app/http/controllers/controller');
 const User = require('app/models/user');
 const Room = require('app/models/room');
 const Role = require('app/models/role');
-
+const Payment = require('app/models/payment');
 class UserController extends Controller {
 	async index(req, res, next) {
 		const page = parseInt(req.query.page) || 1, limit = parseInt(req.query.limit) || 10;
@@ -31,6 +31,7 @@ class UserController extends Controller {
 
 		await newUser.save();
 
+		req.flash('success', 'کاربر با موفقیت اضافه شد.');
 		res.redirect('/admin/user');
 	}
 
@@ -40,7 +41,8 @@ class UserController extends Controller {
 
 		await user.remove();
 
-		res.redirect('/admin/user');
+		req.flash('success', 'کاربر با موفقیت حذف شد.');
+		this.back(req, res);
 	}
 
 	async edit(req, res, next) {
@@ -62,7 +64,7 @@ class UserController extends Controller {
 
 		await User.findByIdAndUpdate(req.params.id, { $set: { ...req.body } });
 
-		req.flash('success', 'کاربر با موفقیت ویرایش شد')
+		req.flash('success', 'کاربر با موفقیت ویرایش شد.');
 		res.redirect('/admin/user');
 	}
 
@@ -75,29 +77,39 @@ class UserController extends Controller {
 	async addRoles(req, res, next) {
 		await User.findByIdAndUpdate(req.params.id, { $set: { roles: req.body.roles || [] } });
 
-		req.flash('success', 'سطوح دسترسی کاربر با موفقیت ویرایش شد');
+		req.flash('success', 'سطوح دسترسی کاربر با موفقیت ویرایش شد.');
 		res.redirect('/admin/user');
 	}
 
 	async reserves(req, res, next) {
-		const user = await User.findById(req.params.id).populate('reservedRooms');
+		const user = await User.findById(req.params.id).populate({
+			path: 'payments',
+			populate: {
+				path: 'room'
+			}
+		});
 		res.render('admin/user/userReserves', { user });
 	}
 
-	async deleteReserve(req, res, next) {
-		const user = await User.findById(req.params.userId).populate('reservedRooms');
-		await user.updateOne({ $pull: { reservedRooms: req.params.reserveId } });
-		await Room.findByIdAndUpdate(req.params.reserveId, { $set: { reserved: false } });
+	async cancelReserve(req, res, next) {
+		const payment = await Payment.findById(req.params.paymentId).populate('room');
 
-		req.flash('success', 'اتاق رزروی کاربر با موفقیت حذف شد');
-		res.redirect(`/admin/user/reserves/${user._id}`);
+		await payment.set({ canceledByAdmin: true });
+		payment.room.set({ reserved: false });
+
+		await payment.room.save();
+		await payment.save();
+
+		req.flash('success', 'اتاق رزروی کاربر با موفقیت لغو شد.');
+		this.back(req, res);
 	}
 
 	async makeAdmin(req, res, next) {
 		const user = await User.findById(req.params.id);
 		await user.updateOne({ $set: { admin: !user.admin } });
 
-		res.redirect('/admin/user');
+		req.flash('success', user.admin ? 'کاربر با موفقیت مدیر شد.' : 'مدیریت کاربر با موفقیت حذف شد.');
+		this.back(req, res);
 	}
 }
 

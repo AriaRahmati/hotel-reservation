@@ -31,7 +31,7 @@ class Controller {
 		if (!result.isEmpty()) {
 			const errors = result.array();
 			const messages = [];
-			errors.forEach(err => { messages.push(err.msg) })
+			errors.forEach(err => { messages.push(err.msg) });
 			req.flash('errors', messages);
 			this.back(req, res);
 			return false;

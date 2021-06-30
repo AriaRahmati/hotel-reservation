@@ -24,7 +24,7 @@ class CommentController extends Controller {
 
 		addComment.check = false;
 		await addComment.save();
-		return this.back(req, res);
+		this.back(req, res);
 	}
 
 	async destroy(req, res, next) {
@@ -38,7 +38,8 @@ class CommentController extends Controller {
 		await comment.autoSection.inc('commentCount', -count);
 
 		await comment.remove();
-		res.redirect('/admin/comment');
+		req.flash('success', 'دیدگاه با موفقیت حذف شد.');
+		this.back(req, res);
 	}
 
 	async verify(req, res, next) {
@@ -50,7 +51,8 @@ class CommentController extends Controller {
 
 		await comment.save();
 
-		res.redirect('/admin/comment');
+		req.flash('success', 'دیدگاه با موفقیت تایید شد.');
+		this.back(req, res);
 	}
 }
 

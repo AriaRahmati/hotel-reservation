@@ -3,8 +3,8 @@ const Controller = require('app/http/controllers/controller');
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
-const faker = require('faker');
 const request = require('request-promise');
+const randomString = require('randomstring');
 
 const Room = require('app/models/room');
 const Payment = require('app/models/payment');
@@ -12,31 +12,6 @@ const User = require('app/models/user');
 
 class RoomController extends Controller {
 	async index(req, res, next) {
-		const fakerRooms = async (count) => {
-			for (let i = 0; i < count; ++i) {
-				const addRoom = new Room({
-					user: req.user._id,
-					title: faker.name.title(),
-					type: (i % 2) ? 'normal' : 'vip',
-					body: faker.lorem.text(),
-					slug: faker.lorem.slug(),
-					images: {
-						'360': faker.image.imageUrl(360, 247, 'none', true),
-						'720': faker.image.imageUrl(720, 494, 'none', true),
-						'480': faker.image.imageUrl(480, 329, 'none', true),
-						'1080': faker.image.imageUrl(1080, 741, 'none', true),
-						'original': faker.image.imageUrl(2560, 1440, 'none', true)
-					},
-					price: faker.commerce.price(150000, 2000000),
-					maxPeople: faker.datatype.number()
-				});
-
-				await addRoom.save();
-			}
-		}
-
-		// await fakerRooms(20);
-
 		// const perPage = 10, page = req.query.page || 1;
 		// await Room.find({}).skip((perPage * page) - perPage).limit(perPage).exec((err, rooms) => {
 		// 	if (err) console.error(err);
@@ -56,21 +31,6 @@ class RoomController extends Controller {
 	}
 
 	async roomPage(req, res, next) {
-		const fakerComments = async (count) => {
-			for (let i = 0; i < count; ++i) {
-				const addComment = new Comment({
-					user: req.user._id,
-					room: '60d89e2e67cedc87ce7d2adc',
-					comment: faker.lorem.text(),
-					check: true,
-				});
-
-				await addComment.save();
-			}
-		}
-
-		// await fakerComments(10);
-
 		const room = await Room.findOneAndUpdate({ slug: req.params.slug }, { $inc: { viewCount: 1 } }).populate([{
 			path: 'user',
 			select: 'name'
@@ -146,6 +106,7 @@ class RoomController extends Controller {
 			if (err) console.error(err);
 		});
 
+		req.flash('success', 'اتاق با موفقیت اضافه شد.');
 		res.redirect('/admin/room');
 	}
 
@@ -169,7 +130,8 @@ class RoomController extends Controller {
 
 		await room.remove();
 
-		res.redirect('/admin/room');
+		req.flash('success', 'اتاق با موفقیت حذف شد.');
+		this.back(req, res);
 	}
 
 	async edit(req, res, next) {
@@ -196,7 +158,7 @@ class RoomController extends Controller {
 		delete req.body.images;
 
 		await Room.findByIdAndUpdate(req.params.id, { $set: { ...req.body, ...imageUrl } });
-		req.flash('success', 'اتاق با موفقیت ویرایش شد')
+		req.flash('success', 'اتاق با موفقیت ویرایش شد.');
 		res.redirect('/admin/room');
 	}
 
@@ -223,13 +185,27 @@ class RoomController extends Controller {
 			return res.redirect(room.path());
 		}
 
-		room.set({ reserved: true });
 		const user = await User.findById(req.user._id);
-		await user.updateOne({ $push: { reservedRooms: room._id } });
+		if (!user)
+			return res.json('چنین کاربری در سایت ثبت نام نکرده است');
+
+		const addPayment = new Payment({
+			user: user._id,
+			room: room._id,
+			authority: randomString.generate(32),
+			price: room.price
+		});
+
+		room.set({ reserved: true });
 
 		await room.save();
+		await user.updateOne({ $push: { payments: addPayment._id } });
+		await addPayment.save();
 
-		req.flash('success', 'رزرو اتاق با موفقیت انجام شد');
+		req.flash('success', [
+			'رزرو اتاق با موفقیت انجام شد',
+			`کد پیگیری:‌ ${addPayment.authority}`
+		]);
 		res.redirect(room.path());
 	}
 
@@ -287,7 +263,7 @@ class RoomController extends Controller {
 				if (response.Statuc == 100) {
 					payment.set({ payment: true });
 					payment.room.set({ reserved: true });
-					payment.user.reservedRooms.push(payment.room._id);
+					payment.user.payments.push(payment.room._id);
 
 					await payment.save();
 					await payment.room.save();

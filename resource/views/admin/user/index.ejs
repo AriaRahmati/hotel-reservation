@@ -3,6 +3,7 @@
 		<%- include(viewPath('layouts/success-messages'), { successMessages }); %>
 		<div class="card">
 			<h5 class="card-header">کاربران</h5>
+			<% if (users.docs.length) { %>
 			<div class="card-body">
 				<div class="table-responsive">
 					<table class="table table-striped table-bordered first">
@@ -32,7 +33,7 @@
 											</form>
 											<a href="/admin/user/roles/<%- user._id %>" class="btn btn-sm btn-outline-dark ml-2">سطح دسترسی</a>
 											<a href="/admin/user/make-admin/<%- user._id %>" class="btn btn-sm btn-outline-<%- user.admin ? 'danger' : 'success' %> ml-2"><%- user.admin ? 'لغو مدیریت' : 'مدیر' %></a>
-											<% if (user.reservedRooms && user.reservedRooms.length) { %>
+											<% if (user.payments && user.payments.length) { %>
 												<a href="/admin/user/reserves/<%- user._id %>" class="btn btn-sm btn-outline-info ml-2">رزروها</a>
 												<% } %> 
 										</div>
@@ -53,6 +54,9 @@
 			</div>
 			<% const { docs, ...rest } = users; %>
         	<%- include(viewPath('layouts/pagination'), { pagination: rest, pageUrl: '/admin/user' }); %>
+			<% } else { %>
+				<h2 class="text-center m-5">کاربری یافت نشد</h2>
+			<% } %>
 		</div>
 	</div>
 </div>

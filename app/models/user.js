@@ -1,15 +1,17 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate');
+const Schema = mongoose.Schema;
+
 const bcrypt = require('bcrypt');
 const randomString = require('randomstring');
 
-const User = mongoose.Schema({
+const User = Schema({
 	admin: { type: Boolean, default: false },
 	name: { type: String, required: true },
 	email: { type: String, required: true },
 	password: { type: String, required: true },
-	roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
-	reservedRooms: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }],
+	roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
+	payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
 	rememberToken: { type: String, default: '' }
 }, {
 	timestamps: true,

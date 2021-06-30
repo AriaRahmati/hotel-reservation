@@ -28,6 +28,7 @@ class PermissionController extends Controller {
 
 		await newPermission.save();
 
+		req.flash('success', 'دسترسی با موفقیت اضافه شد.');
 		res.redirect('/admin/permission');
 	}
 
@@ -37,7 +38,8 @@ class PermissionController extends Controller {
 
 		await permission.remove();
 
-		res.redirect('/admin/permission');
+		req.flash('success', 'دسترسی با موفقیت حذف شد.');
+		this.back(req, res);
 	}
 
 	async edit(req, res, next) {
@@ -55,7 +57,7 @@ class PermissionController extends Controller {
 
 	async updateProcess(req, res, next) {
 		await Permission.findByIdAndUpdate(req.params.id, { $set: { ...req.body } });
-		req.flash('success', 'دسترسی با موفقیت ویرایش شد')
+		req.flash('success', 'دسترسی با موفقیت ویرایش شد.');
 		res.redirect('/admin/permission');
 	}
 }

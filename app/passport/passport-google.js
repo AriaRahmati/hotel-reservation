@@ -14,26 +14,26 @@ passport.deserializeUser(function (id, done) {
 });
 
 passport.use(new googleStrategy({
-    clientID: config.service.GOOGLE.clientID,
-    clientSecret: config.service.GOOGLE.clientSecret,
-    callbackURL: config.service.GOOGLE.callbackURL
-  },
-  function(token, tokenSecret, profile, done) {
-	  User.findOne({email: profile._json.email}, (err, user) => {
-		  if (err) return done(err);
-		  if (user) return done(null, user);
-		 
-		  const newUser = new User({
-			  name: profile._json.name,
-			  email: profile._json.email,
-			  password: profile._json.sub
-		  });
+	clientID: config.service.GOOGLE.clientID,
+	clientSecret: config.service.GOOGLE.clientSecret,
+	callbackURL: config.service.GOOGLE.callbackURL
+},
+	function (token, tokenSecret, profile, done) {
+		User.findOne({ email: profile._json.email }, (err, user) => {
+			if (err) return done(err);
+			if (user) return done(null, user);
 
-		  newUser.save(err => {
-			  if (err) return done(err);
+			const newUser = new User({
+				name: profile._json.name,
+				email: profile._json.email,
+				password: profile._json.sub
+			});
 
-			  done(null, newUser);
-		  });
-	  })
-  }
+			newUser.save(err => {
+				if (err) return done(err);
+
+				done(null, newUser);
+			});
+		})
+	}
 ));

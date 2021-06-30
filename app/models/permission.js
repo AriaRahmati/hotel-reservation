@@ -12,10 +12,10 @@ const Permission = Schema({
 	}
 });
 
-Permission.virtual('roles' , {
-    ref : 'Role',
-    localField : '_id',
-    foreignField : 'permissions'
+Permission.virtual('roles', {
+	ref: 'Role',
+	localField: '_id',
+	foreignField: 'permissions'
 });
 
 Permission.plugin(mongoosePaginate);

@@ -7,7 +7,9 @@ const Payment = Schema({
 	room: { type: Schema.Types.ObjectId, ref: 'Room', default: null },
 	authority: { type: String, required: true },
 	price: { type: Number, required: true },
-	payment: { type: Boolean, default: false }
+	payment: { type: Boolean, default: false },
+	canceledByAdmin: { type: Boolean, default: false },
+	canceledByUser: { type: Boolean, default: false },
 }, {
 	timestamps: true,
 });

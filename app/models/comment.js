@@ -29,7 +29,7 @@ Comment.virtual('autoSection', {
 	localField: doc => {
 		if (doc.room)
 			return 'room'
-	}, 
+	},
 	foreignField: '_id',
 	justOne: true
 });

@@ -42,6 +42,7 @@ router.put('/comment/:id', CheckUserAccess.can('comment'), CommentController.ver
 
 router.get('/profile', ProfileController.index);
 router.put('/profile/:id', RegisterValidator.handle(), ProfileController.updateProfile);
+router.delete('/profile/:reserveId', ProfileController.cancelReserve);
 
 router.get('/permission', CheckUserAccess.can('permission'), PermissionController.index);
 router.get('/permission/create', CheckUserAccess.can('permission'), PermissionController.create);
@@ -66,7 +67,7 @@ router.put('/user/edit/:id', CheckUserAccess.can('user'), RegisterValidator.hand
 router.get('/user/roles/:id', CheckUserAccess.can('user'), UserController.roles);
 router.put('/user/roles/:id', CheckUserAccess.can('user'), UserController.addRoles);
 router.get('/user/reserves/:id', CheckUserAccess.can('user'), UserController.reserves);
-router.delete('/user/reserves/:userId/:reserveId', CheckUserAccess.can('user'), UserController.deleteReserve);
+router.delete('/user/reserves/:userId/:paymentId', CheckUserAccess.can('user'), UserController.cancelReserve);
 router.get('/user/make-admin/:id', CheckUserAccess.can('user'), UserController.makeAdmin);
 
 module.exports = router;

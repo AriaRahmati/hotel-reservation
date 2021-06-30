@@ -55,9 +55,8 @@ passport.use('local.login', new localStrategy({
 			req.flash('errors', error);
 			return done(null, false, { message: error });
 		}
-		
-		if (!user.comparePassword(password))
-		{
+
+		if (!user.comparePassword(password)) {
 			const error = 'رمز عبور اشتباه وارد شده است';
 			req.flash('errors', error);
 			return done(null, false, { message: error });
