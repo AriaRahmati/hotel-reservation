@@ -5,10 +5,12 @@ const path = require('path');
 const sharp = require('sharp');
 const request = require('request-promise');
 const randomString = require('randomstring');
+const moment = require('moment-jalaali');
 
 const Room = require('app/models/room');
 const Payment = require('app/models/payment');
 const User = require('app/models/user');
+const Reservation = require('app/models/reservation');
 
 class RoomController extends Controller {
 	async index(req, res, next) {
@@ -54,6 +56,9 @@ class RoomController extends Controller {
 					select: 'name'
 				}
 			}]
+		}, {
+			path: 'reservations',
+			select: ['dateFrom', 'dateTo']
 		}]);
 
 		if (!room) return res.json('چنین اتاقی در سیستم پیدا نشد');
@@ -176,12 +181,33 @@ class RoomController extends Controller {
 	}
 
 	async payment(req, res, next) {
-		const room = await Room.findById(req.body.room);
+		const userDateFrom = req.body.date_from || '', userDateTo = req.body.date_to || '';
+
+		const room = await Room.findById(req.body.room).populate('reservations');
 		if (!room)
 			return res.json('چنین اتاقی در سایت ثبت نشده است');
 
-		if (room.reserved) {
-			req.flash('errors', 'این اتاق ثبلا رزرو شده است');
+		if (!userDateFrom || !userDateTo) {
+			req.flash('errors', 'تاریخ ورود و خروج خود را مشخص کنید.');
+			return res.redirect(room.path());
+		}
+
+		let alreadyReserved;
+		room.reservations.forEach(reservation => {
+			let { dateFrom, dateTo } = reservation;
+			dateFrom = moment(dateFrom).startOf('jDay');
+			dateTo = moment(dateTo).endOf('jDay');
+			const userDateFromAccess = moment(userDateFrom).startOf('jDay').isBetween(dateFrom, dateTo);
+			const userDateToAccess = moment(userDateTo).endOf('jDay').isBetween(dateFrom, dateTo);
+			const possibleDateFromAccess = moment(dateFrom).startOf('jDay').isBetween(userDateFrom, userDateTo);
+			const possibleDateToAccess = moment(dateTo).endOf('jDay').isBetween(userDateFrom, userDateTo);
+			if (userDateFromAccess || userDateToAccess || possibleDateFromAccess || possibleDateToAccess)
+				alreadyReserved = { dateFrom, dateTo };
+		});
+
+		if (alreadyReserved) {
+			console.log(alreadyReserved);
+			req.flash('errors', `این اتاق در بازه‌ی ${alreadyReserved.dateFrom.format('jD jMMMM jYYYY ساعت HH:mm:ss')} تا ${alreadyReserved.dateTo.format('jD jMMMM jYYYY ساعت HH:mm:ss')} رزرو می‌باشد.`);
 			return res.redirect(room.path());
 		}
 
@@ -189,22 +215,32 @@ class RoomController extends Controller {
 		if (!user)
 			return res.json('چنین کاربری در سایت ثبت نام نکرده است');
 
+		const addReservation = new Reservation({
+			room: room._id,
+			dateFrom: userDateFrom,
+			dateTo: userDateTo
+		});
+
 		const addPayment = new Payment({
 			user: user._id,
-			room: room._id,
+			reservation: addReservation._id,
 			authority: randomString.generate(32),
 			price: room.price
 		});
 
-		room.set({ reserved: true });
+		room.reservations.push(addReservation);
 
+		await addReservation.save();
+		await addPayment.save();
 		await room.save();
 		await user.updateOne({ $push: { payments: addPayment._id } });
-		await addPayment.save();
 
 		req.flash('success', [
-			'رزرو اتاق با موفقیت انجام شد',
-			`کد پیگیری:‌ ${addPayment.authority}`
+			'رزرو اتاق با موفقیت انجام شد.',
+			`کد پیگیری:‌ ${addPayment.authority}`,
+			`تاریخ ورود:‌ ${moment(userDateFrom).startOf('jDay').format('jD jMMMM jYYYY ساعت HH:mm:ss')}`,
+			`تاریخ خروج:‌ ${moment(userDateTo).endOf('jDay').format('jD jMMMM jYYYY ساعت HH:mm:ss')}`,
+			'جزییات رزرواسیون خود را می‌توانید از بخش پروفایل خود مشاهده کنید.'
 		]);
 		res.redirect(room.path());
 	}

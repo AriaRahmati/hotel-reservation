@@ -1,7 +1,6 @@
 const Middleware = require("app/http/middleware/middleware");
 
 const User = require("app/models/user");
-
 class RememberLogin extends Middleware {
 	handle(req, res, next) {
 		if (!req.isAuthenticated()) {

@@ -1,7 +1,6 @@
 const Controller = require('app/http/controllers/controller');
 
 const User = require('app/models/user');
-const Room = require('app/models/room');
 const Role = require('app/models/role');
 const Payment = require('app/models/payment');
 class UserController extends Controller {
@@ -82,22 +81,47 @@ class UserController extends Controller {
 	}
 
 	async reserves(req, res, next) {
+		const users = await User.find({}, { name: 1, email: 1 }).populate({
+			path: 'payments',
+			populate: {
+				path: 'reservation',
+				populate: 'room'
+			}
+		});
+
+		res.render('admin/user/reserves', { users });
+	}
+
+	async userReserves(req, res, next) {
 		const user = await User.findById(req.params.id).populate({
 			path: 'payments',
 			populate: {
-				path: 'room'
+				path: 'reservation',
+				populate: 'room'
 			}
 		});
+
 		res.render('admin/user/userReserves', { user });
 	}
 
 	async cancelReserve(req, res, next) {
-		const payment = await Payment.findById(req.params.paymentId).populate('room');
+		const payment = await Payment.findById(req.params.paymentId).populate({
+			path: 'reservation',
+			populate: {
+				path: 'room',
+				select: 'reservations'
+			}
+		});
 
 		await payment.set({ canceledByAdmin: true });
-		payment.room.set({ reserved: false });
+		const { reservations } = payment.reservation.room;
 
-		await payment.room.save();
+		const index = reservations.indexOf(payment.reservation._id);
+		if (index != -1)
+			reservations.splice(index, 1);
+
+
+		await payment.reservation.room.save();
 		await payment.save();
 
 		req.flash('success', 'اتاق رزروی کاربر با موفقیت لغو شد.');
@@ -108,7 +132,7 @@ class UserController extends Controller {
 		const user = await User.findById(req.params.id);
 		await user.updateOne({ $set: { admin: !user.admin } });
 
-		req.flash('success', user.admin ? 'کاربر با موفقیت مدیر شد.' : 'مدیریت کاربر با موفقیت حذف شد.');
+		req.flash('success', user.admin ? 'مدیریت کاربر با موفقیت حذف شد.' : 'کاربر با موفقیت مدیر شد.');
 		this.back(req, res);
 	}
 }

@@ -1,10 +1,20 @@
 const Controller = require('app/http/controllers/controller');
 
 const User = require('app/models/user');
+const Payment = require('app/models/payment');
 
 class ProfileController extends Controller {
 	async index(req, res) {
-		const profile = await User.findById(req.user.id).populate(['rooms', 'comments', { path: 'payments', populate: 'room' }]);
+		const profile = await User.findById(req.user.id).populate([
+			'rooms',
+			'comments',
+			{
+				path: 'payments',
+				populate: {
+					path: 'reservation',
+					populate: 'room'
+				}
+			}]);
 		res.render('admin/profile', { profile });
 	}
 
@@ -25,16 +35,26 @@ class ProfileController extends Controller {
 	}
 
 	async cancelReserve(req, res, next) {
-		const payment = await Payment.findById(req.params.paymentId).populate('room');
-		if (!payment.user != req.user._id) return res.json('دسترسی غیر مجاز');
+		const payment = await Payment.findById(req.params.paymentId).populate({
+			path: 'reservation',
+			populate: {
+				path: 'room',
+				select: 'reservations'
+			}
+		});
 
 		await payment.set({ canceledByUser: true });
-		payment.room.set({ reserved: false });
+		const { reservations } = payment.reservation.room;
 
-		await payment.room.save();
+		const index = reservations.indexOf(payment.reservation._id);
+		if (index != -1)
+			reservations.splice(index, 1);
+
+
+		await payment.reservation.room.save();
 		await payment.save();
 
-		req.flash('success', 'اتاق رزروی کاربر با موفقیت لغو شد.');
+		req.flash('success', 'اتاق رزروی شما با موفقیت لغو شد.');
 		this.back(req, res);
 	}
 }

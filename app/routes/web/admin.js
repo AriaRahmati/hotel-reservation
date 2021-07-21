@@ -42,7 +42,7 @@ router.put('/comment/:id', CheckUserAccess.can('comment'), CommentController.ver
 
 router.get('/profile', ProfileController.index);
 router.put('/profile/:id', RegisterValidator.handle(), ProfileController.updateProfile);
-router.delete('/profile/:reserveId', ProfileController.cancelReserve);
+router.delete('/profile/:paymentId', ProfileController.cancelReserve);
 
 router.get('/permission', CheckUserAccess.can('permission'), PermissionController.index);
 router.get('/permission/create', CheckUserAccess.can('permission'), PermissionController.create);
@@ -66,8 +66,9 @@ router.get('/user/edit/:id', CheckUserAccess.can('user'), UserController.edit);
 router.put('/user/edit/:id', CheckUserAccess.can('user'), RegisterValidator.handle(), UserController.update);
 router.get('/user/roles/:id', CheckUserAccess.can('user'), UserController.roles);
 router.put('/user/roles/:id', CheckUserAccess.can('user'), UserController.addRoles);
-router.get('/user/reserves/:id', CheckUserAccess.can('user'), UserController.reserves);
-router.delete('/user/reserves/:userId/:paymentId', CheckUserAccess.can('user'), UserController.cancelReserve);
+router.get('/user/reserves', CheckUserAccess.can('reservation'), UserController.reserves);
+router.get('/user/reserves/:id', CheckUserAccess.can('reservation'), UserController.userReserves);
+router.delete('/user/reserves/:paymentId', CheckUserAccess.can('reservation'), UserController.cancelReserve);
 router.get('/user/make-admin/:id', CheckUserAccess.can('user'), UserController.makeAdmin);
 
 module.exports = router;

@@ -28,17 +28,24 @@
                 <div class="col-md-4 mb-4">
                     <div class="card blue-gradient mb-4 wow fadeIn">
                         <div class="card-body">
-                            <h4><strong>قیمت : <%- room.price.toLocaleString('fa-IR') %> تومان</strong>
+                            <h4><strong>قیمت: <%- room.price.toLocaleString('fa-IR') %> تومان</strong>
                             </h4>
                             <% if(auth.check) { %> 
-                                <% if (room.reserved) { %>
-                                    <button type="submit" class="btn btn-lg btn-outline-danger mt-3" disabled style="width: 100%;">رزرو شده</button>
-                                <% } else { %>
-                                    <form action="/room/payment" method="POST">
-                                        <input type="hidden" name="room" value="<%- room._id %>">
-                                        <button type="submit" class="btn btn-lg btn-success mt-3" style="width: 100%;">رزرو اتاق</button>
-                                    </form>
-                                <% } %>
+                                <form action="/room/payment" method="POST">
+                                    <input type="hidden" name="room" value="<%- room._id %>">
+                                    <div class="mt-3">
+                                        <div class="form-group">
+                                            <label for="date_from" class="control-label">از تاریخ</label>
+                                            <input class="form-control" type="date" name="date_from">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="date_to" class="control-label">تا تاریخ</label>
+                                            <input class="form-control" type="date" name="date_to">
+                                        </div>
+                                    </div>
+                                    <p id="test"></p>
+                                    <button type="submit" class="btn btn-lg btn-success" style="width: 100%;">رزرو اتاق</button>
+                                </form>
                             <% } else { %>
                                 <a href="/auth/login" class="btn btn-danger btn-lg mt-3" style="width: 100%">وارد حساب کاربری خود شوید</a>
                             <% } %>
@@ -48,15 +55,27 @@
                         <div class="card-header">ویژگی های اتاق</div>
                         <div class="card-body">
                             <% if(room.type === 'vip') { %> 
-                                <label for="type" class="grey-text">نوع اتاق : ویژه</label><br>
+                                <label for="type" class="grey-text">نوع اتاق: ویژه</label><br>
                             <% } else if(room.type == 'normal') { %>
-                                <label for="type" class="grey-text">نوع اتاق : عادی</label><br>
+                                <label for="type" class="grey-text">نوع اتاق: عادی</label><br>
                             <% } %> 
-                            <label for="maxPeople" class="grey-text">حداکثر نفرات : <%- room.maxPeople.toLocaleString('fa-IR') %> نفر</label><br>
-                            <label for="viewCount" class="grey-text">بازدید : <%- room.viewCount.toLocaleString('fa-IR') %></label><br>
-                            <label for="commentCount" class="grey-text">دیدگاه : <%- room.commentCount.toLocaleString('fa-IR') %></label>
+                            <label for="maxPeople" class="grey-text">حداکثر نفرات: <%- room.maxPeople.toLocaleString('fa-IR') %> نفر</label><br>
+                            <label for="viewCount" class="grey-text">بازدید: <%- room.viewCount.toLocaleString('fa-IR') %></label><br>
+                            <label for="commentCount" class="grey-text">دیدگاه: <%- room.commentCount.toLocaleString('fa-IR') %></label>
                         </div>
                     </div>
+                    <% if (room.reservations.length ) { %>
+                    <div class="card mb-4 wow fadeIn">
+                        <div class="card-header">تاریخ‌های رزرو شده</div>
+                        <div class="card-body">
+                            <% room.reservations.forEach(reservation => { %>
+                                <% let dateFrom = convertTime(reservation.dateFrom).format('jD jMMMM jYYYY') %>
+                                <% let dateTo = convertTime(reservation.dateTo).format('jD jMMMM jYYYY') %>
+                                <label for="maxPeople" class="grey-text">از تاریخ: <%- dateFrom %> تا تاریخ:‌ <%- dateTo %></label><br>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <% } %>
                 </div>
             </div>
         </section>

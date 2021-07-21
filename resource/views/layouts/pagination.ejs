@@ -3,9 +3,9 @@
 		<ul class="pagination">
 			<% const limit = 5; %>
 			<% if (pagination.page == 1) { %>
-				<li class="page-item disabled"><a class="page-link">First</a></li>
+				<li class="page-item disabled"><a class="page-link">ابتدا</a></li>
 			<% } else { %>
-				<li class="page-item"><a class="page-link" href="?page=<%= 1 %>">First</a></li>
+				<li class="page-item"><a class="page-link" href="?page=<%= 1 %>">ابتدا</a></li>
 			<% } %>
 			<% let i = pagination.page > limit ? pagination.page - limit : 1 %>
 			<% if (i != 1) { %>
@@ -13,18 +13,18 @@
 			<% } %>
 			<% for (; i <= pagination.page + limit && i <= pagination.pages; ++i) { %>
 				<% if (i == pagination.page) { %>
-					<li class="page-item active"><a class="page-link"><%= i %></a></li>
+					<li class="page-item active"><a class="page-link"><%= i.toLocaleString('fa-IR') %></a></li>
 				<% } else { %>
-					<li class="page-item"><a class="page-link" href="?page=<%= i %>"><%= i %></a></li>
+					<li class="page-item"><a class="page-link" href="?page=<%= i %>"><%= i.toLocaleString('fa-IR') %></a></li>
 				<% } %>
 				<% if (i == pagination.page + limit && i < pagination.pages) { %>
 					<li class="page-item disabled"><a class="page-link">...</a></li>
 				<% } %>
 			<% } %>
 			<% if (pagination.page == pagination.pages) { %>
-				<li class="page-item disabled"><a class="page-link">Last</a></li>
+				<li class="page-item disabled"><a class="page-link">انتها</a></li>
 			<% } else { %>
-				<li class="page-item"><a class="page-link" href="?page=<%= pagination.pages %>">Last</a></li>
+				<li class="page-item"><a class="page-link" href="?page=<%= pagination.pages %>">انتها</a></li>
 			<% } %>
 		</ul>
 	<% } %>

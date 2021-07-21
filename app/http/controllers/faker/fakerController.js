@@ -29,7 +29,7 @@ class FakerController extends Controller {
 						'original': faker.image.imageUrl(2560, 1440, 'any', true)
 					},
 					price: faker.commerce.price(150000, 2000000),
-					maxPeople: faker.datatype.number()
+					maxPeople: faker.datatype.number(6)
 				});
 
 				await addRoom.save();
@@ -58,28 +58,6 @@ class FakerController extends Controller {
 		}
 
 		res.json(`${count} comments added`)
-	}
-
-	getDir() {
-		const year = new Date().getFullYear();
-		const month = new Date().getMonth();
-		const date = new Date().getDate();
-
-		const dir = `${process.cwd()} \\public\\uploads\\images\\${year} \\${month} \\${date} `;
-
-		if (fs.existsSync) {
-			fs.mkdirSync(dir, { recursive: true });
-		}
-
-		return dir;
-	}
-
-	getFileName(originalname) {
-		const filePath = `${getDir()} /${originalname}`;
-		if (!fs.existsSync(filePath))
-			return originalname;
-		else
-			`${Date.now()}-${originalname}`;
 	}
 }
 

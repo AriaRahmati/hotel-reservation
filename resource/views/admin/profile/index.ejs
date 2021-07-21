@@ -65,6 +65,7 @@
 			</form>
 		</div>
 	</div>
+	<% if (user.payments.length) { %>
 	<div class="card">
 		<h5 class="card-header">تراکنش‌های مالی</h5>
 		<div class="card-body">
@@ -73,49 +74,66 @@
 					<thead>
 						<tr>
 							<th>اتاق</th>
+							<th>نوع</th>
 							<th>مبلغ</th>
+							<th>حداکثر نفرات</th>
 							<th>کد پیگیری</th>
-							<th>تاریخ</th>
+							<th>تاریخ ورود</th>
+							<th>تاریخ خروج</th>
 							<th>تنظیمات</th>
 						</tr>
 					</thead>
 					<tbody>
-						<% const {payments} = profile; %>
-						<% payments.forEach(payment => { %>
-							<% if (!payment.canceledByAdmin) { %>
-							<tr>
-								<td><%- payment.room.title %><a href="/room/<%- payment.room.slug %>"></a></td>
-								<td><%- payment.price.toLocaleString('fa-IR') %></td>
-								<td><%- payment.authority %></td>
-								<td><%- convertTime(payment.createdAt).format('jD jMMMM jYYYY') %></td>
-								<td>
-									<div class="d-flex">
-										<% if (payment.canceledByAdmin) { %>
-											<p class="text text-danger">لغو شده توسط مدیر</p>
-										<% } else if (payment.canceledByUser) { %>
-											<p class="text text-danger">لغو شده توسط کاربر</p>
-										<% } else { %>
-										<form method="POST" action="/admin/profile/<%- payment._id %>?_method=DELETE">
-											<button class="btn btn-sm btn-danger" type="submit">لغو رزرو و درخواست بازگشت وجه</button>
-										</form>
-										<% } %>
-									</div>
-								</td>
-							</tr>
-							<% } %>
+						<% const { payments } = profile; %>
+						<% payments.reverse().forEach(payment => { %>
+						<tr>
+							<% const { room } = payment.reservation; %>
+							<td><a href="<%- room.path() %>"><%- room.title %></a></td>
+							<td>
+								<% if (room.type === 'normal') { %>
+									عادی
+								<% } else if (room.type === 'vip') { %>
+									ویژه
+								<% } else { %>
+									نامشخص
+								<% } %>
+							</td>
+							<td><%- payment.price.toLocaleString('fa-IR') %> تومان</td>
+							<td><%- room.maxPeople.toLocaleString('fa-IR') %> نفر</td>
+							<td><%- payment.authority %></td>
+							<td><%- convertTime(payment.reservation.dateFrom).startOf('jDay').format('jD jMMMM jYYYY ساعت HH:mm:ss') %></td>
+							<td><%- convertTime(payment.reservation.dateTo).endOf('jDay').format('jD jMMMM jYYYY ساعت HH:mm:ss') %></td>
+							<td>
+								<div class="d-flex">
+									<% if (payment.canceledByAdmin) { %>
+										<p class="text text-danger">لغو شده توسط مدیر</p>
+									<% } else if (payment.canceledByUser) { %>
+										<p class="text text-danger">لغو شده توسط کاربر</p>
+									<% } else { %>
+									<form method="POST" action="/admin/profile/<%- payment._id %>?_method=DELETE">
+										<button class="btn btn-sm btn-danger" type="submit">لغو و درخواست بازگشت وجه</button>
+									</form>
+									<% } %>
+								</div>
+							</td>
+						</tr>
 						<% }); %>
 					</tbody>
 					<tfoot>
 						<tr>
 							<th>اتاق</th>
+							<th>نوع</th>
 							<th>مبلغ</th>
+							<th>حداکثر نفرات</th>
 							<th>کد پیگیری</th>
-							<th>تاریخ</th>
+							<th>تاریخ ورود</th>
+							<th>تاریخ خروج</th>
 							<th>تنظیمات</th>
 						</tr>
 					</tfoot>
 				</table>
 		</div>
 	</div>
+	<% } %>
 </div>
 </div>

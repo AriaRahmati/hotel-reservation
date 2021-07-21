@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const Payment = Schema({
 	user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-	room: { type: Schema.Types.ObjectId, ref: 'Room', default: null },
+	reservation: { type: Schema.Types.ObjectId, ref: 'Reservation', default: null },
 	authority: { type: String, required: true },
 	price: { type: Number, required: true },
 	payment: { type: Boolean, default: false },

@@ -11,7 +11,7 @@ const Room = Schema({
 	body: { type: String, required: true },
 	price: { type: Number, required: true },
 	maxPeople: { type: Number, required: true },
-	reserved: { type: Boolean, default: false },
+	reservations: [{ type: Schema.Types.ObjectId, ref: 'Reservation' }],
 	viewCount: { type: Number, default: 0 },
 	commentCount: { type: Number, default: 0 },
 }, {
