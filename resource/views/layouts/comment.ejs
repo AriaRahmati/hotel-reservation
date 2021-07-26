@@ -4,10 +4,13 @@
     <div class="card-body">
         <% data.comments.forEach(comment => { %>
         <div class="media mb-4">
-            <img class="d-flex ml-3 rounded-circle" src="https://via.placeholder.com/60/c7c7c7/000000/?text=Comment" alt="">
+            <img class="d-flex ml-4 rounded-circle" src="https://via.placeholder.com/60/c7c7c7/000000/?text=Comment" alt="">
             <div class="media-body">
                 <h5 class="mt-2">
-                    <%- comment.user.name %>
+                    <div class="row">
+                        <%- comment.user.name %>
+                        <h6 class="mr-2 mt-1 text text-info"><%- comment.user.admin ? 'مدیر وبسایت' : comment.user.roles.includes('60f8170d4604752894d2fecf') ? 'پشتیبان' : comment.user.roles.includes('60f8175d4604752894d2fed0') ? 'مسئول پذیرش' : '' %></h6>
+                    </div>
                     <% if(auth.check) { %>
                     <button type="button" class="float-left btn-sm btn btn-xs btn-success" data-toggle="modal"
                         data-target="#sendCommentModal" data-parent="<%- comment._id %>">پاسخ</button>
@@ -17,11 +20,12 @@
                 <%- comment.comment %>
                 <% comment.comments.forEach(comment => { %>
                 <div class="media mt-4">
-                    <img class="d-flex ml-3 rounded-circle" src="https://via.placeholder.com/60/c7c7c7/000000/?text=Reply" alt="">
+                    <img class="d-flex ml-4 rounded-circle" src="https://via.placeholder.com/60/c7c7c7/000000/?text=Reply" alt="">
                     <div class="media-body">
-                        <h5 class="mt-2">
-                            <%- comment.user.name %>
-                        </h5>
+                        <div class="row mt-2 align-items-center">
+                            <h5><%- comment.user.name %></h5>
+                            <h6 class="mr-2 text text-info"><%- comment.user.admin ? 'مدیر وبسایت' : comment.user.roles.includes('60f8170d4604752894d2fecf') ? 'پشتیبان' : comment.user.roles.includes('60f8175d4604752894d2fed0') ? 'مسئول پذیرش' : '' %></h6>
+                        </div>
                         <p class="small"><%= convertTime(comment.createdAt).fromNow()%></p>
                         <%- comment.comment %>
                     </div>

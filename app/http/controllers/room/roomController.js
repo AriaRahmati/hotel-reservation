@@ -45,7 +45,7 @@ class RoomController extends Controller {
 			},
 			populate: [{
 				path: 'user',
-				select: 'name'
+				select: ['name', 'roles', 'admin']
 			}, {
 				path: 'comments',
 				match: {
@@ -53,13 +53,15 @@ class RoomController extends Controller {
 				},
 				populate: {
 					path: 'user',
-					select: 'name'
+					select: ['name', 'roles', 'admin']
 				}
 			}]
 		}, {
 			path: 'reservations',
 			select: ['dateFrom', 'dateTo']
 		}]);
+
+		// return res.json(room.comments)
 
 		if (!room) return res.json('چنین اتاقی در سیستم پیدا نشد');
 

@@ -33,7 +33,12 @@
                                     <div class="card mb-4">
                                         <a href="<%- room.path() %>"><img src="<%- room.images['480'] %>" alt="<% room.title %>" class="card-img-top"></a>
                                         <div class="card-body">
-                                            <h5 class="card-text mb-4"><%- room.title %></h5>
+                                            <div class="d-flex align-items-center">
+                                                <% if (room.type === 'vip') { %>
+                                                  <i class="fa fa-fw fa-star mb-4 ml-2"></i>
+                                                <% } %>
+                                                <h5 class="card-text mb-4"><%- room.title %></h5>
+                                            </div>
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div class="btn-group">
                                                     <a href="<%= room.path() %>"
